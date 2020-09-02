@@ -4,14 +4,46 @@ import com.example.schoolmanagement.entity.Person
 
 object PersonValidator {
 
-    fun validatePersonForAddition(person: Person) {
-        TODO("Not yet implemented")
+    fun validatePersonForAddition(person: Person): Result<String> {
+        val errorList = mutableListOf<Error<String>>()
+
+        val nameResult = checkName(person.firstName, person.middleName, person.lastName)
+
+        if (nameResult is Errors) {
+            errorList.addAll(nameResult.errors)
+        }
+
+        val result = validatePerson(person)
+
+        if (result is Errors) {
+            errorList.addAll(result.errors)
+        }
+
+        return if (errorList.isEmpty()) {
+            Success(SUCCESS)
+        } else {
+            Errors(errorList)
+        }
+
+
     }
+
+    // Let's not validate dob and address for now
 
     fun validatePerson(person: Person): Result<String> {
-        TODO("Not yet implemented")
-    }
+        val errorList = mutableListOf<Error<String>>()
+        val phoneNoResult = checkPhoneNo(person.phoneNo)
 
+        if (phoneNoResult is Errors) {
+            errorList.addAll(phoneNoResult.errors)
+        }
+
+        return if (errorList.isEmpty()) {
+            Success(SUCCESS)
+        } else {
+            Errors(errorList)
+        }
+    }
 
     fun checkName(firstName: String, middleName: String, lastName: String): Result<String> {
         val errorList = mutableListOf<Error<String>>()
@@ -44,7 +76,7 @@ object PersonValidator {
         val errorList = mutableListOf<Error<String>>()
 
         val (tPhoneNo) = Utils.trimStrings(phoneNo)
-        
+
         if (tPhoneNo.isEmpty()) {
             errorList.add(Error(ALL_EMPTY))
             return Errors(errorList)

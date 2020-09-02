@@ -8,10 +8,10 @@ data class Course(
         val minNoOfStudents: Int,
         val maxNoOfStudents: Int,
         val start: Date,
-        val end: Date
+        val end: Date,
+        val isCanceled: Boolean = false // by default not cancelled
 ) {
 
+    // i do not know if this should be immutable
     var professors: List<Professor> = emptyList() // list of professors that will teach the course
-
-    var isCanceled: Boolean = false // by default not cancelled
 }

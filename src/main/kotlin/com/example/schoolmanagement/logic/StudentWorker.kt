@@ -6,9 +6,20 @@ import java.time.Year
 class StudentWorker {
 
     fun addStudent(student: Student): Result<String> {
-        PersonValidator.validatePersonForAddition(student)
+        val errorList = mutableListOf<Error<String>>()
 
-        return Success(SUCCESS)
+        val validationResult = PersonValidator.validatePersonForAddition(student)
+        if (validationResult is Errors) {
+            errorList.addAll(validationResult.errors)
+        }
+
+        // call save to repository method
+
+        return if (errorList.isEmpty()) {
+            Success(SUCCESS)
+        } else {
+            Errors(errorList)
+        }
     }
 
     fun getStudent(id: Int): Result<Student> {
@@ -16,8 +27,8 @@ class StudentWorker {
 
         when (result) {
             is Success -> {
-                val student = result.data
-                student.age = getAge(student.dateOfBirth.year)
+                val dob = result.data.dateOfBirth
+                val student = result.data.copy(age = getAge(dob.year))
                 return Success(student)
             }
 
