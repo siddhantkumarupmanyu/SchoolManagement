@@ -7,7 +7,13 @@ import com.example.schoolmanagement.entity.Student
 
 object Temp {
 
-    fun getTempStudent(): Result<Student> {
+    fun getResult() : Result<Student>{
+        val student = Temp.getTempStudent() // assume this student is coming from repository
+        val result = Success(student)
+        return result
+    }
+
+    fun getTempStudent(): Student {
         val address = Address(
                 "streetAddress",
                 "city",
@@ -18,7 +24,7 @@ object Temp {
 
         val dateOfBirth = Date(1, 0, 1998)
 
-        return Success(Student(
+        return Student(
                 NOT_DEFINED,
                 "firstName",
                 "lastName",
@@ -26,8 +32,8 @@ object Temp {
                 "9876543210",
                 address,
                 dateOfBirth,
-                false
-        ))
+                international = false
+        )
     }
 
 }

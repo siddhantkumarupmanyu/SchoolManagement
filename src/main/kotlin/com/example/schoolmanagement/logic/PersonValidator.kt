@@ -4,49 +4,35 @@ import com.example.schoolmanagement.entity.Person
 
 object PersonValidator {
 
-    fun validatePersonForAddition(person: Person): Result<String> {
-        val errorList = mutableListOf<Error<String>>()
+    fun validatePersonForAddition(person: Person): Errors<Person> {
+        val errorList = mutableListOf<Error<Person>>()
 
         val nameResult = checkName(person.firstName, person.middleName, person.lastName)
 
-        if (nameResult is Errors) {
-            errorList.addAll(nameResult.errors)
-        }
+        errorList.addAll(nameResult.errors)
 
         val result = validatePerson(person)
 
-        if (result is Errors) {
-            errorList.addAll(result.errors)
-        }
+        errorList.addAll(result.errors)
 
-        return if (errorList.isEmpty()) {
-            Success(SUCCESS)
-        } else {
-            Errors(errorList)
-        }
+        return Errors(errorList)
 
 
     }
 
     // Let's not validate dob and address for now
 
-    fun validatePerson(person: Person): Result<String> {
-        val errorList = mutableListOf<Error<String>>()
+    fun validatePerson(person: Person): Errors<Person> {
+        val errorList = mutableListOf<Error<Person>>()
         val phoneNoResult = checkPhoneNo(person.phoneNo)
 
-        if (phoneNoResult is Errors) {
-            errorList.addAll(phoneNoResult.errors)
-        }
+        errorList.addAll(phoneNoResult.errors)
 
-        return if (errorList.isEmpty()) {
-            Success(SUCCESS)
-        } else {
-            Errors(errorList)
-        }
+        return Errors(errorList)
     }
 
-    fun checkName(firstName: String, middleName: String, lastName: String): Result<String> {
-        val errorList = mutableListOf<Error<String>>()
+    fun checkName(firstName: String, middleName: String, lastName: String): Errors<Person> {
+        val errorList = mutableListOf<Error<Person>>()
 
         val trimmedNames = Utils.trimStrings(firstName, middleName, lastName)
 
@@ -65,15 +51,12 @@ object PersonValidator {
             errorList.add(Error(ONLY_ALPHA))
         }
 
-        return if (errorList.isEmpty()) {
-            Success(SUCCESS)
-        } else {
-            Errors(errorList)
-        }
+        return Errors(errorList)
+
     }
 
-    fun checkPhoneNo(phoneNo: String): Result<String> {
-        val errorList = mutableListOf<Error<String>>()
+    fun checkPhoneNo(phoneNo: String): Errors<Person> {
+        val errorList = mutableListOf<Error<Person>>()
 
         val (tPhoneNo) = Utils.trimStrings(phoneNo)
 
@@ -89,11 +72,8 @@ object PersonValidator {
             errorList.add(Error(PHONE_NO_LENGTH_MISMATCHED))
         }
 
-        return if (errorList.isEmpty()) {
-            Success(SUCCESS)
-        } else {
-            Errors(errorList)
-        }
+        return Errors(errorList)
+
     }
 
 }

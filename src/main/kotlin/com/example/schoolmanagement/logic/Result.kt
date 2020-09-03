@@ -1,6 +1,6 @@
 package com.example.schoolmanagement.logic
 
-sealed class Result<T>
+sealed class Result<in T>
 
 data class Success<T>(
         val data: T
