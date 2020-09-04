@@ -1,12 +1,12 @@
 package com.example.schoolmanagement.logic
 
+import com.example.schoolmanagement.entity.Enroll
 import com.example.schoolmanagement.entity.Student
 import java.time.Year
 
 class StudentWorker {
 
     fun addStudent(student: Student): Result<Student> {
-        val errorList = mutableListOf<Error<Student>>()
 
         val validationResult = PersonValidator.validatePersonForAddition(student)
         if (validationResult.errors.isNotEmpty()) {
@@ -14,6 +14,8 @@ class StudentWorker {
         }
 
         // call save to repository method which returns the id if insertion is successful
+        // TODO complete this method
+        val errorList = mutableListOf<Error<Student>>()
 
         return if (errorList.isEmpty()) {
             Success(SUCCESS)
@@ -33,9 +35,9 @@ class StudentWorker {
 
         when (result) {
             is Success -> {
-                val dob = result.data.dateOfBirth
-                val studentCp = result.data.copy(age = getAge(dob.year))
-                return Success(studentCp)
+                val student = result.data
+                student.age = getAge(student.dateOfBirth.year)
+                return Success(student)
             }
 
             is Error -> return result
@@ -45,6 +47,20 @@ class StudentWorker {
         }
 
     }
+
+    fun enroll(enroll: Enroll): Result<Enroll> {
+        // todo check if student id and course id in enroll is valid
+        // add date before saving
+        TODO()
+    }
+
+    fun getEnrollments(studentId: Int): Result<List<Enroll>> {
+
+        // call repository and return list of enrollments
+        TODO()
+
+    }
+
 
     private fun getAge(year: Int): Int {
         val currentYear = Year.now().value

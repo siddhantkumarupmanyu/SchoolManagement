@@ -11,5 +11,5 @@ abstract class Person {
     abstract val address: Address
     abstract val dateOfBirth: Date
 
-    abstract val age: Int
+    abstract var age: Int // lets make items which need to be calculated as var
 }

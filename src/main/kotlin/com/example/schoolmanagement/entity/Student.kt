@@ -8,17 +8,20 @@ data class Student(
         override val phoneNo: String,
         override val address: Address,
         override val dateOfBirth: Date,
-        override val age: Int = NOT_DEFINED,
 
         val international: Boolean
 
 
 ) : Person() {
 
-    var enrollments: List<Enroll> = emptyList() // I don't know if this should be immutable
+    override var age: Int = NOT_DEFINED
 
-    val isPartTime: Boolean
-        get() = enrollments.size >= 2 // if he is entrolled in two or more courses
+    // i think this list should not be a part of student
+    // var enrollments: List<Enroll> = emptyList() // I don't know if this should be immutable
+
+    // since its dependent on enrollments its can be removed from here
+    /*val isPartTime: Boolean
+        get() = enrollments.size >= 2 // if he is entrolled in two or more courses*/
 
 
     /*val isOnProbation: Boolean

@@ -16,3 +16,5 @@ const val ONLY_DIGIT = "Only Digits are permitted here"
 const val PHONE_NO_LENGTH_MISMATCHED  = "Invalid Phone No"
 
 const val SUCCESS = "Success"
+
+const val NO_ENTRY = "Entry Not Found"

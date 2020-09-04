@@ -8,10 +8,11 @@ data class Professor(
         override val phoneNo: String,
         override val address: Address,
         override val dateOfBirth: Date,
-        override val age: Int = NOT_DEFINED,
 
         val salary: Float
 ) : Person(){
+
+    override var age: Int = NOT_DEFINED
 
     var courses: List<Course> = emptyList() // I don't know if this should be immutable
 
