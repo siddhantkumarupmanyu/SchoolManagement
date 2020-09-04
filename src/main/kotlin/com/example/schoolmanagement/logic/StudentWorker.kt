@@ -49,7 +49,7 @@ class StudentWorker {
     }
 
     fun enroll(enroll: Enroll): Result<Enroll> {
-        // todo check if student id and course id in enroll is valid
+        // todo check if student id and course id in enroll is valid that is its not enrolled before
         // add date before saving
         TODO()
     }

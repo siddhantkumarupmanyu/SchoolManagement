@@ -1,15 +1,15 @@
 package com.example.schoolmanagement.entity
 
 data class Student(
-        override val id: Int = NOT_DEFINED,
-        override val firstName: String,
-        override val lastName: String,
-        override val middleName: String,
-        override val phoneNo: String,
-        override val address: Address,
-        override val dateOfBirth: Date,
+    override val id: Int = NOT_DEFINED,
+    override val firstName: String,
+    override val lastName: String,
+    override val middleName: String,
+    override val phoneNo: String,
+    override val address: Address,
+    override val dateOfBirth: Date,
 
-        val international: Boolean
+    val international: Boolean
 
 
 ) : Person() {
