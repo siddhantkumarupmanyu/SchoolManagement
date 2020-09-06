@@ -18,3 +18,5 @@ const val PHONE_NO_LENGTH_MISMATCHED  = "Invalid Phone No"
 const val SUCCESS = "Success"
 
 const val NO_ENTRY = "Entry Not Found"
+
+const val UNABLE_TO_ADD = "Unable to Add"

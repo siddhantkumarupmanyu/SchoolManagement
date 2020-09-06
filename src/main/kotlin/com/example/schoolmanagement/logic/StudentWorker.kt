@@ -1,10 +1,11 @@
 package com.example.schoolmanagement.logic
 
+import com.example.schoolmanagement.database.StudentRepository
 import com.example.schoolmanagement.entity.Enroll
 import com.example.schoolmanagement.entity.Student
 import java.time.Year
 
-class StudentWorker {
+class StudentWorker(private val studentRepository: StudentRepository) {
 
     fun addStudent(student: Student): Result<Student> {
 
@@ -13,39 +14,33 @@ class StudentWorker {
             return validationResult
         }
 
-        // call save to repository method which returns the id if insertion is successful
-        // TODO complete this method
-        val errorList = mutableListOf<Error<Student>>()
+        return when (val studentResult = studentRepository.addStudent(student)) {
 
-        return if (errorList.isEmpty()) {
-            Success(SUCCESS)
-        } else {
-            Errors(errorList)
+            is Success -> {
+                val studentCreated = student.copy(id = studentResult.data)
+                studentCreated.age = getAge(studentCreated.dateOfBirth.year)
+                Success(studentCreated)
+            }
+
+            is Error -> Error(studentResult.errorMessage)
+            is Errors -> studentResult as Errors<Student> // should i care about it
+
         }
+
     }
 
     fun getStudent(id: Int): Result<Student> {
-        // val student = Temp.getTempStudent() // assume this student is coming from repository
-        // val result = Success(student)
-        val result = Temp.getResult()
-
-        // just testing in out
-        // val res = addStudent(Temp.getTempStudent())
-        // val dd = (res as Errors).errors
-
-        when (result) {
+        // add calculate age of the student
+        return when (val studentResult = studentRepository.getStudent(id)) {
             is Success -> {
-                val student = result.data
+                val student = studentResult.data
                 student.age = getAge(student.dateOfBirth.year)
-                return Success(student)
+                Success(student)
             }
 
-            is Error -> return result
-
-            is Errors -> return result
-
+            is Error -> Error(studentResult.errorMessage)
+            is Errors -> studentResult as Errors<Student> // should i care about it
         }
-
     }
 
     fun enroll(enroll: Enroll): Result<Enroll> {

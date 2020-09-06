@@ -34,10 +34,12 @@ class EnrollmentDataSourceTest {
         assertThat(enrollResult, `is`(Success(ENROLL_SUCCESS) as Result<*>))
 
         val enrollListResult = Success(listOf(enroll))
+//        val enrollListResult = Errors<List<Enroll>>(listOf(Error("Test"))) // it fails
 
         val getEnrollList = enrollmentDataSource.get { studentId, courseCode ->
             studentId == enroll.studentId && courseCode == enroll.courseCode
         }
+        // assertThat does (getEnrollList is enrollListResult) inside itself only
         assertThat(getEnrollList, `is`(enrollListResult as Result<List<Enroll>>))
     }
 
