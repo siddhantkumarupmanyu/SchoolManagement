@@ -1,17 +1,14 @@
 package com.example.schoolmanagement.logic
 
 import com.example.schoolmanagement.database.StudentRepository
-import com.example.schoolmanagement.entity.Address
-import com.example.schoolmanagement.entity.Date
-import com.example.schoolmanagement.entity.NOT_DEFINED
-import com.example.schoolmanagement.entity.Student
+import com.example.schoolmanagement.entity.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
+import org.mockito.Mockito.*
+import java.time.LocalDate
 import java.time.Year
 
 class StudentWorkerTest {
@@ -128,5 +125,38 @@ class StudentWorkerTest {
         getStudentRes as Error
         assertThat(getStudentRes, `is`(Error(NO_ENTRY)))
     }
+
+    @Test
+    fun enrollInsert_Success() {
+        val enroll = Enroll(0, 0)
+
+        `when`(repository.enrollDoesExist(0, 0)).thenReturn(false)
+        `when`(repository.insertEnroll(anyObj(Enroll::class.java))).thenReturn(Success(SUCCESS))
+
+        val insertEnrollRes = studentWorker.enroll(enroll)
+        assertTrue(insertEnrollRes is Success)
+        insertEnrollRes as Success
+        val localDate = LocalDate.now()
+        val currentDate = Date(localDate.dayOfMonth, localDate.monthValue - 1, localDate.year)
+        assertThat(insertEnrollRes.data, `is`(enroll.copy(date = currentDate)))
+
+        verify(repository).insertEnroll(enroll.copy(date = currentDate))
+    }
+
+    @Test
+    fun enroll_GetEnrollments() {
+        val enroll = Enroll(0, 0)
+        val listOfEnrolls = listOf(enroll, enroll.copy(courseCode = 100), enroll.copy(courseCode = 1001))
+        `when`(repository.getEnrollments(0)).thenReturn(
+            Success(listOfEnrolls)
+        )
+
+        val getEnrollments = studentWorker.getEnrollments(0)
+        assertTrue(getEnrollments is Success)
+        getEnrollments as Success
+        assertThat(getEnrollments.data, `is`(listOfEnrolls))
+    }
+
+    private fun <T> anyObj(type: Class<T>): T = any<T>(type)
 
 }
