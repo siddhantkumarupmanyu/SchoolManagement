@@ -19,12 +19,16 @@ class ProfessorRepository(
         return professorDataSource.doesExist(id)
     }
 
-    fun addCourse(id: Int, courseCode: Int): Result<Unit> {
+    /*fun addCourse(id: Int, courseCode: Int): Result<Unit> {
         return professorDataSource.addCourse(id, courseCode)
-    }
+    }*/
 
     fun getCourses(id: Int): Result<List<Int>> {
         return professorDataSource.getCourses(id)
     }
+
+    /*fun removeLastCourse(id: Int): Result<Unit>{
+        return professorDataSource.removeLastCourse(id)
+    }*/
 
 }

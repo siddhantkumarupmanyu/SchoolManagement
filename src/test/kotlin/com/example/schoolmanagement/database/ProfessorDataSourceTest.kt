@@ -196,4 +196,26 @@ class ProfessorDataSourceTest {
 
     }
 
+    @Test
+    fun addProf_addCourses_removeCourse(){
+        professorDataSource.insert(professor)
+
+        professorDataSource.addCourse(0, 10)
+        professorDataSource.addCourse(0, 20)
+        professorDataSource.addCourse(0, 30)
+
+        val res = professorDataSource.getCourses(0)
+        assertTrue(res is Success)
+        res as Success
+        assertThat(res.data, `is`(listOf(10, 20, 30)))
+
+        professorDataSource.removeLastCourse(0)
+
+        val res1 = professorDataSource.getCourses(0)
+        assertTrue(res1 is Success)
+        res1 as Success
+        assertThat(res1.data, `is`(listOf(10, 20)))
+
+    }
+
 }

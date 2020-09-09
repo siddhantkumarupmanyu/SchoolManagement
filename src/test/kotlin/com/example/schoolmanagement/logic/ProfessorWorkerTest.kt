@@ -55,18 +55,18 @@ class ProfessorWorkerTest {
         Mockito.`when`(repository.addProfessor(professor)).thenReturn(Success(0))
         Mockito.`when`(repository.getProfessor(0)).thenReturn(Success(professorId0))
 
-        val addStudentRes = professorWorker.addProfessor(professor)
-        Assert.assertTrue(addStudentRes is Success)
-        addStudentRes as Success
-        MatcherAssert.assertThat(addStudentRes, Matchers.`is`(Success(professorId0)))
+        val addProfRes = professorWorker.addProfessor(professor)
+        Assert.assertTrue(addProfRes is Success)
+        addProfRes as Success
+        MatcherAssert.assertThat(addProfRes, Matchers.`is`(Success(professorId0)))
         // cause data class equal takes only constructor parameters
-        MatcherAssert.assertThat(addStudentRes.data.age, Matchers.`is`(professorId0.age))
+        MatcherAssert.assertThat(addProfRes.data.age, Matchers.`is`(professorId0.age))
 
-        val getStudentRes = professorWorker.getProfessor(0)
-        Assert.assertTrue(getStudentRes is Success)
-        getStudentRes as Success
-        MatcherAssert.assertThat(getStudentRes, Matchers.`is`(Success(professorId0)))
-        MatcherAssert.assertThat(getStudentRes.data.age, Matchers.`is`(professorId0.age))
+        val getProfRes = professorWorker.getProfessor(0)
+        Assert.assertTrue(getProfRes is Success)
+        getProfRes as Success
+        MatcherAssert.assertThat(getProfRes, Matchers.`is`(Success(professorId0)))
+        MatcherAssert.assertThat(getProfRes.data.age, Matchers.`is`(professorId0.age))
     }
 
     @Test
@@ -102,18 +102,18 @@ class ProfessorWorkerTest {
             Matchers.`is`(Errors<Professor>(listOf(Error(UNABLE_TO_ADD), Error("SecondError"))))
         )
 
-        val getStudentRes = professorWorker.getProfessor(0)
-        Assert.assertTrue(getStudentRes is Errors)
-        getStudentRes as Errors
+        val getProfRes = professorWorker.getProfessor(0)
+        Assert.assertTrue(getProfRes is Errors)
+        getProfRes as Errors
         MatcherAssert.assertThat(
-            getStudentRes,
+            getProfRes,
             Matchers.`is`(Errors<Professor>(listOf(Error(NO_ENTRY), Error("SecondError"))))
         )
     }
 
     @Test
     fun addProfErrors_ByPersonValidator_GetProfError() {
-        val wrongStudent = professor.copy(firstName = "yoyo121", phoneNo = "21545sdsd4")
+        val wrongProf = professor.copy(firstName = "yoyo121", phoneNo = "21545sdsd4")
 
         Mockito.`when`(repository.addProfessor(professor)).thenReturn(Success(0))
         Mockito.`when`(repository.getProfessor(0)).thenReturn(Error(NO_ENTRY))
@@ -123,7 +123,7 @@ class ProfessorWorkerTest {
             Error<Professor>(ONLY_DIGIT)
         )
 
-        val addRes = professorWorker.addProfessor(wrongStudent)
+        val addRes = professorWorker.addProfessor(wrongProf)
         Assert.assertTrue(addRes is Errors)
         addRes as Errors
         MatcherAssert.assertThat(addRes, Matchers.`is`(Errors(listOfErrors)))

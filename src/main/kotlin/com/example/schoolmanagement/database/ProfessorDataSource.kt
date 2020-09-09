@@ -48,4 +48,13 @@ class ProfessorDataSource : DataSource<Professor>, Existence {
         return Success(courses)
     }
 
+    fun removeLastCourse(id: Int): Result<Unit> {
+        val currentList = coursesMap[id]!!
+        val removedList = currentList.dropLast(1)
+
+        coursesMap[id] = removedList
+
+        return Success(SUCCESS)
+    }
+
 }

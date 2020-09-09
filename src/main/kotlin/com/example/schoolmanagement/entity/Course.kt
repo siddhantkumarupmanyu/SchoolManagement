@@ -2,7 +2,7 @@ package com.example.schoolmanagement.entity
 
 
 data class Course(
-    val code: Int,
+    val code: Int = NOT_DEFINED,
     val name: String,
     val minNoOfStudents: Int,
     val maxNoOfStudents: Int,
