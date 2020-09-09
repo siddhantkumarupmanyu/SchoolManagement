@@ -1,15 +1,13 @@
 package com.example.schoolmanagement.logic
 
 import com.example.schoolmanagement.database.ProfessorRepository
-import com.example.schoolmanagement.entity.Address
-import com.example.schoolmanagement.entity.Date
-import com.example.schoolmanagement.entity.NOT_DEFINED
-import com.example.schoolmanagement.entity.Professor
+import com.example.schoolmanagement.entity.*
 import org.hamcrest.MatcherAssert
 import org.hamcrest.Matchers
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import java.time.Year
 
@@ -19,11 +17,13 @@ class ProfessorWorkerTest {
     private lateinit var professor: Professor
 
     private lateinit var repository: ProfessorRepository
+    private lateinit var courseWorker: CourseWorker
 
     @Before
     fun setUp() {
         repository = Mockito.mock(ProfessorRepository::class.java)
-        professorWorker = ProfessorWorker(repository)
+        courseWorker = Mockito.mock(CourseWorker::class.java)
+        professorWorker = ProfessorWorker(repository, courseWorker)
 
         val address = Address(
             "streetAddress",
@@ -134,6 +134,126 @@ class ProfessorWorkerTest {
         MatcherAssert.assertThat(getRes, Matchers.`is`(Error(NO_ENTRY)))
     }
 
+    @Test
+    fun getCourses_Error_FromRepo() {
+        Mockito.`when`(repository.getCourses(ArgumentMatchers.anyInt())).thenReturn(Error("Some Error"))
+
+        val (_, error) = professorWorker.getCourses(0)
+        MatcherAssert.assertThat(error.errors, Matchers.`is`(listOf(Error<List<Course>>("Some Error"))))
+
+        val errorList = listOf(Error<List<Int>>("Some Error"), Error<List<Int>>("Second Error"))
+        Mockito.`when`(repository.getCourses(ArgumentMatchers.anyInt())).thenReturn(Errors<List<Int>>(errorList))
+
+        val (_, errors) = professorWorker.getCourses(0)
+        MatcherAssert.assertThat(
+            errors.errors,
+            Matchers.`is`(listOf(Error<List<Course>>("Some Error"), Error<List<Course>>("Second Error")))
+        )
+
+    }
+
+    @Test
+    fun getProfessors_Error_FromProfessorWorker() {
+        Mockito.`when`(repository.getCourses(ArgumentMatchers.anyInt())).thenReturn(Success(listOf(0, 1, 2)))
+        Mockito.`when`(courseWorker.getCourse(ArgumentMatchers.anyInt())).thenReturn(Error("Some Error"))
+
+        val (_, error1) = professorWorker.getCourses(0)
+
+        MatcherAssert.assertThat(
+            error1.errors,
+            Matchers.`is`(
+                listOf(
+                    // Error("profId => error it got")
+                    Error<List<Course>>("0 => Some Error"),
+                    Error<List<Course>>("1 => Some Error"),
+                    Error<List<Course>>("2 => Some Error")
+                )
+            )
+        )
+
+
+        Mockito.`when`(courseWorker.getCourse(ArgumentMatchers.anyInt())).thenReturn(
+            Errors(listOf(Error("Some Error"), Error("2nd Error")))
+        )
+
+        val (_, error2) = professorWorker.getCourses(0)
+        MatcherAssert.assertThat(
+            error2.errors,
+            Matchers.`is`(
+                listOf(
+                    // Error("profId => error it got")
+                    Error<List<Course>>("0 => Some Error"),
+                    Error<List<Course>>("0 => 2nd Error"),
+                    Error<List<Course>>("1 => Some Error"),
+                    Error<List<Course>>("1 => 2nd Error"),
+                    Error<List<Course>>("2 => Some Error"),
+                    Error<List<Course>>("2 => 2nd Error")
+                )
+            )
+        )
+
+
+        Mockito.`when`(courseWorker.getCourse(0)).thenReturn(
+            Errors(listOf(Error("Some Error"), Error("2nd Error")))
+        )
+        Mockito.`when`(courseWorker.getCourse(1)).thenReturn(Error("Some Error"))
+        Mockito.`when`(courseWorker.getCourse(2)).thenReturn(Error("Some Error"))
+
+        val (_, error3) = professorWorker.getCourses(0)
+        MatcherAssert.assertThat(
+            error3.errors,
+            Matchers.`is`(
+                listOf(
+                    // Error("profId => error it got")
+                    Error<List<Course>>("0 => Some Error"),
+                    Error<List<Course>>("0 => 2nd Error"),
+                    Error<List<Course>>("1 => Some Error"),
+                    Error<List<Course>>("2 => Some Error")
+                )
+            )
+        )
+
+    }
+
+
+    @Test
+    fun getProfessors_Mixed_FromProfessorWorker() {
+        Mockito.`when`(repository.getCourses(ArgumentMatchers.anyInt())).thenReturn(Success(listOf(0, 1, 2, 3)))
+
+        val startDate = Date(9, 8, 2020)
+        val endDate = Date(9, 9, 2020)
+
+        val course = Course(
+            NOT_DEFINED,
+            "name",
+            10,
+            100,
+            startDate,
+            endDate
+        )
+
+        Mockito.`when`(courseWorker.getCourse(0)).thenReturn(
+            Errors(listOf(Error("Some Error"), Error("2nd Error")))
+        )
+        Mockito.`when`(courseWorker.getCourse(1)).thenReturn(Success(course))
+        Mockito.`when`(courseWorker.getCourse(2)).thenReturn(Error("Some Error"))
+        Mockito.`when`(courseWorker.getCourse(3)).thenReturn(Success(course.copy(code = 3)))
+
+        val (success, error) = professorWorker.getCourses(0)
+        MatcherAssert.assertThat(
+            error.errors,
+            Matchers.`is`(
+                listOf(
+                    // Error("profId => error it got")
+                    Error<List<Course>>("0 => Some Error"),
+                    Error<List<Course>>("0 => 2nd Error"),
+                    Error<List<Course>>("2 => Some Error")
+                )
+            )
+        )
+
+        MatcherAssert.assertThat(success.data, Matchers.`is`(listOf(course, course.copy(code = 3))))
+    }
 
     private fun <T> anyObj(type: Class<T>): T = Mockito.any<T>(type)
 
