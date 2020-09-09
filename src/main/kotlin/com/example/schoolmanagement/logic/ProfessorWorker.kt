@@ -1,3 +1,50 @@
 package com.example.schoolmanagement.logic
 
-// TODO We do after i have fully implemented student worker with enrollment and everything working
+import com.example.schoolmanagement.database.ProfessorRepository
+import com.example.schoolmanagement.entity.Professor
+import java.time.Year
+
+class ProfessorWorker(private val professorRepository: ProfessorRepository) {
+
+    fun addProfessor(professor: Professor): Result<Professor> {
+
+        val validationResult = PersonValidator.validatePersonForAddition(professor)
+        if (validationResult.errors.isNotEmpty()) {
+            return validationResult
+        }
+
+        return when (val result = professorRepository.addProfessor(professor)) {
+
+            is Success -> {
+                val created = professor.copy(id = result.data)
+                created.age = getAge(created.dateOfBirth.year)
+                Success(created)
+            }
+
+            is Error -> Error(result.errorMessage)
+            is Errors -> result as Errors<Professor> // should i care about it
+
+        }
+
+    }
+
+    fun getProfessor(id: Int): Result<Professor> {
+        // add calculate age of the student
+        return when (val result = professorRepository.getProfessor(id)) {
+            is Success -> {
+                val professor = result.data
+                professor.age = getAge(professor.dateOfBirth.year)
+                Success(professor)
+            }
+
+            is Error -> Error(result.errorMessage)
+            is Errors -> result as Errors<Professor> // should i care about it
+        }
+    }
+
+    private fun getAge(year: Int): Int {
+        val currentYear = Year.now().value
+        return currentYear - year
+    }
+
+}

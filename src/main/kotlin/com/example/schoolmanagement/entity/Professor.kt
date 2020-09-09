@@ -14,6 +14,7 @@ data class Professor(
 
     override var age: Int = NOT_DEFINED
 
-    var courses: List<Course> = emptyList() // I don't know if this should be immutable
+    // this should not be here i guess
+//    var courses: List<Course> = emptyList() // I don't know if this should be immutable
 
 }
